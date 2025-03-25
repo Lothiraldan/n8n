@@ -1,3 +1,6 @@
+// Only OpikCallbackHandler is used now
+import { OpikCallbackHandler } from 'opik-langchain';
+
 import type { BaseCallbackConfig } from '@langchain/core/callbacks/manager';
 import type { IExecuteFunctions } from 'n8n-workflow';
 
@@ -13,6 +16,17 @@ export function getTracingConfig(
 		? context.getParentCallbackManager()
 		: undefined;
 
+	const opikHandler = new OpikCallbackHandler({
+		tags: [], // Optional
+		metadata: {}, // Optional, additional metadata for each trace logged by the tracer.
+		projectName: 'test-n8n-js', // Optional, if not sent data will be logged to the default project
+	});
+
+	// Combine OpikCallbackHandler with parent callback manager if available
+	const callbackHandlers = parentRunManager 
+		? [opikHandler, parentRunManager] 
+		: [opikHandler];
+
 	return {
 		runName: `[${context.getWorkflow().name}] ${context.getNode().name}`,
 		metadata: {
@@ -21,6 +35,8 @@ export function getTracingConfig(
 			node: context.getNode().name,
 			...(config.additionalMetadata ?? {}),
 		},
-		callbacks: parentRunManager,
+		callbacks: callbackHandlers,
 	};
 }
+
+

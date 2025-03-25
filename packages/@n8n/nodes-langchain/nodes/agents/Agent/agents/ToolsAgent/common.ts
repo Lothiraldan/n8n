@@ -11,8 +11,15 @@ import type { IExecuteFunctions } from 'n8n-workflow';
 import type { ZodObject } from 'zod';
 import { z } from 'zod';
 
-import { isChatInstance, getConnectedTools } from '@utils/helpers';
-import { type N8nOutputParser } from '@utils/output_parsers/N8nOutputParser';
+import { isChatInstance, getPromptInputByType, getConnectedTools } from '@utils/helpers';
+import {
+	getOptionalOutputParser,
+	type N8nOutputParser,
+} from '@utils/output_parsers/N8nOutputParser';
+import { tracingCallbacks } from '@utils/tracing';
+
+import { SYSTEM_MESSAGE } from './prompt';
+
 /* -----------------------------------------------------------
    Output Parser Helper
 ----------------------------------------------------------- */
