@@ -12,20 +12,14 @@ export function getTracingConfig(
 	context: IExecuteFunctions,
 	config: TracingConfig = {},
 ): BaseCallbackConfig {
-	const parentRunManager = context.getParentCallbackManager
-		? context.getParentCallbackManager()
-		: undefined;
+	if (context.getParentCallbackManager) {
+		const callbackHandlers = context.getParentCallbackManager();
+		parentRunManager.addHandler(opikHandler);
+	} else {
+		const callbackHandlers = tracingCallbacks;
+	}
 
-	const opikHandler = new OpikCallbackHandler({
-		tags: [], // Optional
-		metadata: {}, // Optional, additional metadata for each trace logged by the tracer.
-		projectName: 'test-n8n-js', // Optional, if not sent data will be logged to the default project
-	});
-
-	// Combine OpikCallbackHandler with parent callback manager if available
-	const callbackHandlers = parentRunManager 
-		? [opikHandler, parentRunManager] 
-		: [opikHandler];
+	console.log('callbackHandlers', callbackHandlers);
 
 	return {
 		runName: `[${context.getWorkflow().name}] ${context.getNode().name}`,
@@ -39,4 +33,16 @@ export function getTracingConfig(
 	};
 }
 
-
+export const tracingCallbacks = [
+	// new CallbackHandler({
+	// 	secretKey: 'sk-lf-d0c030b2-2288-4a11-9dec-4dbc54608896',
+	// 	publicKey: 'pk-lf-5926b9d7-8717-4dc4-a734-a2c0e042150f',
+	// 	baseUrl: 'https://cloud.langfuse.com', // 🇪🇺 EU region
+	// 	// baseUrl: "https://us.cloud.langfuse.com", // 🇺🇸 US region
+	// }),
+	new OpikCallbackHandler({
+		tags: [], // Optional
+		metadata: {}, // Optional, additional metadata for each trace logged by the tracer.
+		projectName: 'test-n8n-js', // Optional, if not sent data will be logged to the default project
+	}),
+];

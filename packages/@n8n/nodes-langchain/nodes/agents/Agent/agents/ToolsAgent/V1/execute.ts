@@ -16,6 +16,7 @@ import {
 	prepareMessages,
 	preparePrompt,
 } from '../common';
+import { tracingCallbacks } from '@utils/tracing';
 import { SYSTEM_MESSAGE } from '../prompt';
 
 /* -----------------------------------------------------------
@@ -98,7 +99,7 @@ export async function toolsAgentExecute(this: IExecuteFunctions): Promise<INodeE
 					formatting_instructions:
 						'IMPORTANT: For your response to user, you MUST use the `format_final_json_response` tool with your complete answer formatted according to the required schema. Do not attempt to format the JSON manually - always use this tool. Your response will be rejected if it is not properly formatted through this tool. Only use this tool once you are ready to provide your final answer.',
 				},
-				{ signal: this.getExecutionCancelSignal() },
+				{ signal: this.getExecutionCancelSignal(), callbacks: tracingCallbacks },
 			);
 
 			// If memory and outputParser are connected, parse the output.
